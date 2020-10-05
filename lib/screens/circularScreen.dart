@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -130,6 +131,13 @@ class _CircularScreenState extends State<CircularScreen> {
             "url": url.trim(),
             "description": description.trim(),
           });
+      CollectionReference notification =
+          FirebaseFirestore.instance.collection('notification');
+      await notification.add({
+        'title': title.toUpperCase(),
+        'body': description,
+        'to': "notify",
+      });
       if (response.body == "yes") {
         Navigator.pop(context);
         _scaffoldKey.currentState.showSnackBar(snackBar("Successfull!!"));
@@ -151,7 +159,7 @@ class _CircularScreenState extends State<CircularScreen> {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2015),
-      lastDate: DateTime.now(),
+      lastDate: DateTime(2100),
     );
   }
 

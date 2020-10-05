@@ -32,6 +32,9 @@ dependencies:
   http:
   auto_size_text: ^2.1.0
   intl: ^0.16.1
+  firebase_messaging: ^7.0.0
+  cloud_firestore: ^0.14.0+2
+  firebase_core: "0.5.0"
     
 
 dev_dependencies:

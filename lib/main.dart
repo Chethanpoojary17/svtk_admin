@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:skvt_admin/screens/circularScreen.dart';
@@ -6,7 +7,8 @@ import 'package:skvt_admin/screens/galleryScreen.dart';
 import 'package:skvt_admin/screens/homeScreen.dart';
 import 'package:skvt_admin/screens/sevaScreen.dart';
 
-void main() {
+void main() async {
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -15,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'SVTK Admin',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Color(0xff650D01),

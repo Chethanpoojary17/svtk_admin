@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -42,7 +43,6 @@ class _EventScreenState extends State<EventScreen> {
         await http.get("http://svtkallianpur.com/wp-content/php/getEvents.php");
     final data = json.decode(response.body);
     _eventList = data["events"];
-    print(response.body);
     setState(() {
       isLoad = false;
     });
@@ -126,6 +126,15 @@ class _EventScreenState extends State<EventScreen> {
         "name": name,
         "date": date,
       });
+      CollectionReference notification =
+          FirebaseFirestore.instance.collection('notification');
+      await notification.add({
+        'title': name.toUpperCase(),
+        'body': name.toUpperCase() +
+            " On " +
+            DateFormat('dd/MM/yyyy').format(DateTime.parse(date)),
+        'to': "notify",
+      });
       if (response.body == "yes") {
         addLoad = false;
         Navigator.pop(context);
@@ -148,7 +157,8 @@ class _EventScreenState extends State<EventScreen> {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2015),
-      lastDate: DateTime.now(),
+      lastDate: DateTime(2100),
+      helpText: "Choose the date",
     );
   }
 
@@ -194,19 +204,22 @@ class _EventScreenState extends State<EventScreen> {
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),
-                  RaisedButton(
-                    onPressed: () {
-                      updateEvent(
-                        _eventList[index]["id"].toString(),
-                        _name.text,
-                        _date.toString(),
-                      );
-                    },
-                    child: formLoad
-                        ? Center(child: CircularProgressIndicator())
-                        : Text("Submit"),
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  formLoad
+                      ? Center(child: CircularProgressIndicator())
+                      : RaisedButton(
+                          onPressed: () {
+                            updateEvent(
+                              _eventList[index]["id"].toString(),
+                              _name.text,
+                              _date.toString(),
+                            );
+                          },
+                          child: Text(
+                            "Submit",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Theme.of(context).primaryColor,
+                        ),
                 ],
               ),
             ),

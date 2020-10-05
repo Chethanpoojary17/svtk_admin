@@ -11,7 +11,6 @@ class Gallery {
         .get("http://svtkallianpur.com/wp-content/getGalleryFolders.php");
     final data = json.decode(response.body);
     _folders = data["gallery"];
-    print(response.body);
   }
 
   List getGalleryFolders() {
