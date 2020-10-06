@@ -1,6 +1,6 @@
 # skvt_admin
 
-A new Flutter project.
+A new Flutter projects.
 
 ## Getting Started
 
