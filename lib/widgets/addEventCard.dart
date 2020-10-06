@@ -7,13 +7,16 @@ class AddEvent extends StatelessWidget {
     @required Size mediaQuery,
     @required TextEditingController nameAdd,
     @required DateTime dateAdd,
+    @required TimeOfDay timeAdd,
     @required this.addLoad,
     @required this.datePicker,
     @required this.setDate,
     @required this.addEvents,
+    @required this.timePicker,
   })  : _mediaQuery = mediaQuery,
         _nameAdd = nameAdd,
         _dateAdd = dateAdd,
+        _timeAdd = timeAdd,
         super(key: key);
 
   final Size _mediaQuery;
@@ -23,6 +26,8 @@ class AddEvent extends StatelessWidget {
   final Function datePicker;
   final Function setDate;
   final Function addEvents;
+  final Function timePicker;
+  final TimeOfDay _timeAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +51,27 @@ class AddEvent extends StatelessWidget {
               ),
             ),
           ),
+          // Expanded(
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(8.0),
+          //     child: Text(
+          //       _dateAdd == null
+          //           ? "Date Not Selected"
+          //           : DateFormat('dd/MM/yyyy').format(_dateAdd),
+          //       style: TextStyle(fontWeight: FontWeight.bold),
+          //       textAlign: TextAlign.center,
+          //     ),
+          //   ),
+          // ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+            child: FlatButton(
+              onPressed: () async {
+                final temp = await datePicker();
+                setDate(temp, 1);
+              },
               child: Text(
                 _dateAdd == null
-                    ? "Date Not Selected"
+                    ? "Choose Date"
                     : DateFormat('dd/MM/yyyy').format(_dateAdd),
                 style: TextStyle(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
@@ -60,15 +80,20 @@ class AddEvent extends StatelessWidget {
           ),
           Expanded(
             child: FlatButton(
-              onPressed: () async {
-                final temp = await datePicker();
-                setDate(temp, 1);
-              },
+              onPressed: _dateAdd != null
+                  ? () async {
+                      final t = await timePicker();
+                      final temp = DateTime(_dateAdd.year, _dateAdd.month,
+                          _dateAdd.day, t.hour, t.minute);
+                      setDate(temp, 1, t);
+                    }
+                  : null,
               child: Text(
-                "Choose Date",
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.bold),
+                _timeAdd == null
+                    ? "Choose Time"
+                    : DateFormat.jm().format(_dateAdd),
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
               ),
             ),
           ),

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -23,6 +23,8 @@ class _EventScreenState extends State<EventScreen> {
   TextEditingController _nameAdd = new TextEditingController();
   DateTime _date;
   DateTime _dateAdd;
+  DateTime _updateBackup;
+  TimeOfDay _time, _timeAdd;
   bool formLoad = false;
   bool addLoad = false;
 
@@ -162,8 +164,20 @@ class _EventScreenState extends State<EventScreen> {
     );
   }
 
-  setDate(DateTime date, int i) {
-    i == 1 ? _dateAdd = date : _date = date;
+  _timePicker() async {
+    return showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+  }
+
+  setDate(DateTime date, int i, [TimeOfDay time]) {
+    if (TimeOfDay == null) {
+      i == 1 ? _dateAdd = date : _date = date;
+    } else {
+      i == 1 ? _timeAdd = time : _time = time;
+      i == 1 ? _dateAdd = date : _date = date;
+    }
     setState(() {});
   }
 
@@ -188,11 +202,6 @@ class _EventScreenState extends State<EventScreen> {
                       labelStyle: TextStyle(fontSize: 20),
                     ),
                   ),
-                  Text(
-                    _date == null
-                        ? "Not Selected"
-                        : DateFormat('dd/MM/yyyy').format(_date),
-                  ),
                   FlatButton(
                     onPressed: () async {
                       final temp = await _datePicker();
@@ -200,7 +209,25 @@ class _EventScreenState extends State<EventScreen> {
                       setState(() {});
                     },
                     child: Text(
-                      "Choose Date",
+                      _date == null
+                          ? "Choose Date"
+                          : DateFormat('dd/MM/yyyy').format(_date),
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    ),
+                  ),
+                  FlatButton(
+                    onPressed: _date != null
+                        ? () async {
+                            final t = await _timePicker();
+                            final temp = DateTime(_date.year, _date.month,
+                                _date.day, t.hour, t.minute);
+                            setDate(temp, 0, t);
+                          }
+                        : null,
+                    child: Text(
+                      _time == null
+                          ? "Choose Time"
+                          : DateFormat.jm().format(_date),
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),
@@ -254,6 +281,8 @@ class _EventScreenState extends State<EventScreen> {
             datePicker: _datePicker,
             setDate: setDate,
             addEvents: _addEvents,
+            timePicker: _timePicker,
+            timeAdd: _timeAdd,
           ),
           Container(
             height: _mediaQuery.height * 0.75,
@@ -274,7 +303,7 @@ class _EventScreenState extends State<EventScreen> {
                             ),
                           ),
                           subtitle: Text(
-                            "Date: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(_eventList[index]["date"]))}",
+                            "Date: ${DateFormat.yMd().add_jm().format(DateTime.parse(_eventList[index]["date"]))}",
                             style: TextStyle(
                               fontSize: 15,
                             ),
@@ -319,6 +348,14 @@ class _EventScreenState extends State<EventScreen> {
                                 _name.text = _eventList[index]["name"];
                                 _date =
                                     DateTime.parse(_eventList[index]["date"]);
+                                _time = TimeOfDay(
+                                  hour: int.parse(
+                                    DateFormat.H().format(_date),
+                                  ),
+                                  minute: int.parse(
+                                    DateFormat.m().format(_date),
+                                  ),
+                                );
                                 await buildShowDialog(
                                     context, _mediaQuery, index);
                               }
